@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAbilities 
+[Serializable]
+public struct PlayerAbilities 
 {
-
+    public List<Material> fixMaterials;
 }

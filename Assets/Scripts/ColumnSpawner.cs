@@ -4,21 +4,36 @@ using UnityEngine;
 
 public class ColumnSpawner : MonoBehaviour
 {
-    [SerializeField] Transform[] spawnPoints;
-    [SerializeField] GameObject ColumnPrefab;
-    [SerializeField] Material[] columnMaterials;
-    [SerializeField] private float levelTime;
+    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private GameObject ColumnPrefab;
+    [SerializeField] private Material[] columnMaterials;
+    [SerializeField] private float nextLevelDelay;
     private List<Column> columns = new List<Column>();
-    private Column currentChangedColumn;
     private Coroutine activeCoroutine;
+    private Column currentChangedColumn;
+
+    public Column CurrentChangedColumn
+    {
+        get
+        {
+            if (currentChangedColumn != null)
+            {
+                return currentChangedColumn;
+            }
+            return null;
+        }
+    }
+
+    public Material[] ColumnMaterials => columnMaterials;
 
     private void SpawnColumns()
     {
         DestroyAllColumns();
         foreach (var point in spawnPoints)
         {
-            Column newColumn = Instantiate(ColumnPrefab, point.position, Quaternion.identity, transform).GetComponent<Column>();
-            newColumn.InitializeColumn();
+            GameObject newGameObject = Instantiate(ColumnPrefab, point.position, Quaternion.identity, transform);
+            Column newColumn = newGameObject.GetComponent<Column>();
+            newColumn.InitializeColumn(this);
             columns.Add(newColumn);
         }
     }
@@ -39,7 +54,7 @@ public class ColumnSpawner : MonoBehaviour
     private void SetMaterialToRandomColumn(Material newMaterial)
     {
         currentChangedColumn = ChooseColumn();
-        currentChangedColumn.SetMaterial(newMaterial);
+        currentChangedColumn.SetColoredMaterial(newMaterial);
     }
 
     private Column ChooseColumn()
@@ -62,13 +77,14 @@ public class ColumnSpawner : MonoBehaviour
     {
         if (currentChangedColumn == null || currentChangedColumn.DefaultState)
         {
-            activeCoroutine = StartCoroutine(nextLevel());
+            currentChangedColumn = null;
+            activeCoroutine = StartCoroutine(ConfigureNextLevel());
         }
     }
 
-    IEnumerator nextLevel()
+    IEnumerator ConfigureNextLevel()
     {
-        yield return new WaitForSeconds(levelTime);
+        yield return new WaitForSeconds(nextLevelDelay);
         Material newMaterial = RandomBag.RandomChoice(columnMaterials);
         SetMaterialToRandomColumn(newMaterial);
     }

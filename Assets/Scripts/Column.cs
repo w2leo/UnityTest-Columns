@@ -8,20 +8,37 @@ public class Column : MonoBehaviour
     [SerializeField] private Material defaultMaterial;
     private ColumnProperty columsProperty;
     private MeshRenderer meshRenderer;
+    private ColumnSpawner columnSpawner;
 
     public bool DefaultState => columsProperty.material == defaultMaterial;
 
-    public void InitializeColumn()
+    public void InitializeColumn(ColumnSpawner columnSpawner)
     {
         columsProperty = new ColumnProperty(defaultMaterial);
         meshRenderer = GetComponent<MeshRenderer>();
-        SetMaterial(columsProperty.material);
+        SetMaterial(defaultMaterial);
+        this.columnSpawner = columnSpawner;
     }
 
-    public void SetMaterial(Material newMaterial)
+    public void SetColoredMaterial(Material material)
+    {
+        if (material != defaultMaterial)
+            SetMaterial(material);
+    }
+
+    private void SetMaterial(Material newMaterial)
     {
         columsProperty.material = newMaterial;
         meshRenderer.material = columsProperty.material;
+    }
+
+    public void FixMaterial()
+    {
+        if (!DefaultState)
+        {
+            SetMaterial(defaultMaterial);
+            columnSpawner.NextLevel();
+        }
     }
 
     public Material GetMaterial() => columsProperty.material;
