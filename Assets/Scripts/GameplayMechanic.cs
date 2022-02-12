@@ -5,5 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(ColumnSpawner))]
 public class GameplayMechanic : MonoBehaviour
 {
+    
+
 
 }

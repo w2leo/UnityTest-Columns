@@ -3,17 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ColumnSpawner : MonoBehaviour
-{   
-    [SerializeField] GameObject ColumnPrefab;
-    [SerializeField] private float spawnTime;
-    private float timer;
+{
     [SerializeField] Transform[] spawnPoints;
+    [SerializeField] GameObject ColumnPrefab;
+    [SerializeField] Material[] columnMaterials;
+    [SerializeField] private float levelTime;
     private List<Column> columns = new List<Column>();
     private Column currentChangedColumn;
+    private Coroutine activeCoroutine;
 
-    private void Start()
+    private void SpawnColumns()
     {
-        SpawnColumns();
+        DestroyAllColumns();
+        foreach (var point in spawnPoints)
+        {
+            Column newColumn = Instantiate(ColumnPrefab, point.position, Quaternion.identity, transform).GetComponent<Column>();
+            newColumn.InitializeColumn();
+            columns.Add(newColumn);
+        }
+    }
+
+    private void DestroyAllColumns()
+    {
+        if (activeCoroutine != null)
+            StopCoroutine(activeCoroutine);
+
+        foreach (var column in columns)
+        {
+            Destroy(column.gameObject);
+        }
+        columns.Clear();
+        currentChangedColumn = null;
     }
 
     private void SetMaterialToRandomColumn(Material newMaterial)
@@ -24,20 +44,32 @@ public class ColumnSpawner : MonoBehaviour
 
     private Column ChooseColumn()
     {
-        return RandomChoice(columns);
+        return RandomBag.RandomChoice(columns);
     }
 
-    private void SpawnColumns()
+    public void StartGame()
     {
-        foreach (var point in spawnPoints)
+        SpawnColumns();
+        NextLevel();
+    }
+
+    public void StopGame()
+    {
+        DestroyAllColumns();
+    }
+
+    public void NextLevel()
+    {
+        if (currentChangedColumn == null || currentChangedColumn.DefaultState)
         {
-            Column newColumn = Instantiate(ColumnPrefab, point.position, Quaternion.identity, transform).GetComponent<Column>();
-            columns.Add(newColumn);
+            activeCoroutine = StartCoroutine(nextLevel());
         }
     }
 
-    private T RandomChoice<T>(List<T> bag)
+    IEnumerator nextLevel()
     {
-        return bag[Random.Range(0, bag.Count - 1)];
+        yield return new WaitForSeconds(levelTime);
+        Material newMaterial = RandomBag.RandomChoice(columnMaterials);
+        SetMaterialToRandomColumn(newMaterial);
     }
 }
