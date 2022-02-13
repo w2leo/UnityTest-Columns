@@ -4,7 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct PlayerAbilities 
+public class PlayerAbilities 
 {
     public List<Material> fixMaterials;
+
+    public PlayerAbilities()
+    {
+        fixMaterials = new List<Material>();
+    }
 }

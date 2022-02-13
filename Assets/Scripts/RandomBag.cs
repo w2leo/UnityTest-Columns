@@ -55,7 +55,7 @@ public class RandomBag
         return false;
     }
 
-    public static void SuffleBageNoSameNear<T>(List<T> bag)
+    public static void SuffleBagNoSameNear<T>(List<T> bag)
     {
         int maxOperationCounter = 50;
         do

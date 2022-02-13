@@ -22,20 +22,16 @@ public class Player : MonoBehaviour
         StopMove();
     }
 
-    public void InitializePlayer(Material[] materialAbilities, ColumnSpawner columnSpawner)
+    public void InitializePlayer(PlayerAbilities abilities, ColumnSpawner columnSpawner)
     {
         this.columnSpawner = columnSpawner;
-        SetAbilityies(materialAbilities);
+        SetAbilityies(abilities);
         AddVisualAbilities();
     }
 
-    private void SetAbilityies(Material[] materialAbilities)
+    private void SetAbilityies(PlayerAbilities abilities)
     {
-        abilities.fixMaterials.Clear();
-        foreach (var material in materialAbilities)
-        {
-            abilities.fixMaterials.Add(material);
-        }
+        this.abilities = abilities;
     }
 
     private void AddVisualAbilities()
@@ -63,7 +59,6 @@ public class Player : MonoBehaviour
             newVisualAbility.GetComponent<MeshRenderer>().material = abilities.fixMaterials[i];
             firstPosition.x += quadInterval;
         }
-
     }
 
     private void GoAndFixColumn()

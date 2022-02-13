@@ -27,16 +27,14 @@ public class PlayerSpawner : MonoBehaviour
     private void SpawnPlayers()
     {
         DestroyAllPlayers();
-        Material[] newAbilities = CreateAbilityBag();
+        PlayerAbilities[] newAbilities = CreateAbilities();
         for (int i = 0; i < spawnPoints.Length; i++)
         {
-            int startIndex = i * MAX_ABILITIES;
-            int endIndex = startIndex + MAX_ABILITIES - 1;
-            CreatePlayerObject(RandomBag.SubArray(newAbilities, startIndex, endIndex), spawnPoints[i].position);
+            CreatePlayerObject(newAbilities[i], spawnPoints[i].position);
         }
     }
 
-    private void CreatePlayerObject(Material [] abilities, Vector3 position)
+    private void CreatePlayerObject(PlayerAbilities abilities, Vector3 position)
     {
         GameObject playerGameObject = Instantiate(PlayerPrefab, position, Quaternion.identity, transform);
         Player newPlayer = playerGameObject.GetComponent<Player>();
@@ -54,20 +52,34 @@ public class PlayerSpawner : MonoBehaviour
         players.Clear();
     }
 
-    private Material[] CreateAbilityBag()
+    private PlayerAbilities[] CreateAbilities()
     {
-        List<Material> newAbilities = new List<Material>();
-        newAbilities = CreateMaterialBag();
+        List<PlayerAbilities> newAbilities = new List<PlayerAbilities>();
+        AddMaterialsToAbilities(newAbilities);
         return newAbilities.ToArray();
+    }
+
+    private void AddMaterialsToAbilities(List<PlayerAbilities> playersAbilities)
+    {
+        List<Material> materialBag = CreateMaterialBag();
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            int startIndex = i * MAX_ABILITIES;
+            int endIndex = startIndex + MAX_ABILITIES - 1;
+            playersAbilities.Add(new PlayerAbilities());
+            foreach (var item in RandomBag.SubArray(materialBag.ToArray(), startIndex, endIndex))
+            {
+                playersAbilities[i].fixMaterials.Add(item);
+            }
+        }
     }
 
     private List<Material> CreateMaterialBag()
     {
         List<Material> materialBag = new List<Material>();
-
         AddBaseMaterials(materialBag);
         AddAdditionalMaterials(materialBag);
-        RandomBag.SuffleBageNoSameNear(materialBag);
+        RandomBag.SuffleBagNoSameNear(materialBag);
         return materialBag;
     }
 
