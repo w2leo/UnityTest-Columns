@@ -43,4 +43,30 @@ public class RandomBag
         return newArray;
     }
 
+    public static bool CheckForSameInRow<T>(List<T> bag)
+    {
+        for (int i = 0; i < bag.Count - 1; i += 2)
+        {
+            if (bag[i].Equals(bag[i + 1]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void SuffleBageNoSameNear<T>(List<T> bag)
+    {
+        int maxOperationCounter = 50;
+        do
+        {
+            if (maxOperationCounter == 0)
+            {
+                throw new System.Exception("Shuffle with no same near error");
+            }
+            maxOperationCounter--;
+            RandomBag.ShuffleBag(ref bag);
+        }
+        while (RandomBag.CheckForSameInRow(bag));
+    }
 }

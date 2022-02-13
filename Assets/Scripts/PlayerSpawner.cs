@@ -13,12 +13,12 @@ public class PlayerSpawner : MonoBehaviour
     [SerializeField] private Button[] buttons;
     private List<Player> players = new List<Player>();
 
-
     public void StartGame()
     {
         SpawnPlayers();
-        AttacheButtons();
+        AttacheButtonsToPlayers();
     }
+
     public void StopGame()
     {
         DestroyAllPlayers();
@@ -27,16 +27,21 @@ public class PlayerSpawner : MonoBehaviour
     private void SpawnPlayers()
     {
         DestroyAllPlayers();
-        Material[] newAbilities = ChooseAbilities();
+        Material[] newAbilities = CreateAbilityBag();
         for (int i = 0; i < spawnPoints.Length; i++)
         {
-            GameObject playerGameObject = Instantiate(PlayerPrefab, spawnPoints[i].position, Quaternion.identity, transform);
-            Player newPlayer = playerGameObject.GetComponent<Player>();
             int startIndex = i * MAX_ABILITIES;
             int endIndex = startIndex + MAX_ABILITIES - 1;
-            newPlayer.InitializePlayer(RandomBag.SubArray(newAbilities, startIndex, endIndex), columnSpawner);
-            players.Add(newPlayer);
+            CreatePlayerObject(RandomBag.SubArray(newAbilities, startIndex, endIndex), spawnPoints[i].position);
         }
+    }
+
+    private void CreatePlayerObject(Material [] abilities, Vector3 position)
+    {
+        GameObject playerGameObject = Instantiate(PlayerPrefab, position, Quaternion.identity, transform);
+        Player newPlayer = playerGameObject.GetComponent<Player>();
+        newPlayer.InitializePlayer(abilities, columnSpawner);
+        players.Add(newPlayer);
     }
 
     private void DestroyAllPlayers()
@@ -49,7 +54,7 @@ public class PlayerSpawner : MonoBehaviour
         players.Clear();
     }
 
-    private Material[] ChooseAbilities()
+    private Material[] CreateAbilityBag()
     {
         List<Material> newAbilities = new List<Material>();
         newAbilities = CreateMaterialBag();
@@ -60,41 +65,29 @@ public class PlayerSpawner : MonoBehaviour
     {
         List<Material> materialBag = new List<Material>();
 
+        AddBaseMaterials(materialBag);
+        AddAdditionalMaterials(materialBag);
+        RandomBag.SuffleBageNoSameNear(materialBag);
+        return materialBag;
+    }
+
+    private void AddBaseMaterials(List<Material> materialBag)
+    {
         foreach (var material in columnSpawner.ColumnMaterials)
         {
             materialBag.Add(material);
         }
+    }
+
+    private void AddAdditionalMaterials(List<Material> materialBag)
+    {
         while (materialBag.Count < spawnPoints.Length * MAX_ABILITIES)
         {
             materialBag.Add(RandomBag.RandomChoice(columnSpawner.ColumnMaterials));
         }
-        int maxOperationCounter = 20;
-        do
-        {
-            if (maxOperationCounter == 0)
-            {
-                throw new System.StackOverflowException();
-            }
-            maxOperationCounter--;
-            RandomBag.ShuffleBag(ref materialBag);
-        }
-        while (CheckFoSameInRow(materialBag));
-        return materialBag;
     }
 
-    private bool CheckFoSameInRow(List<Material> bag)
-    {
-        for (int i = 0; i < bag.Count - 1; i += 2)
-        {
-            if (bag[i] == bag[i + 1])
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void AttacheButtons()
+    private void AttacheButtonsToPlayers()
     {
         if (buttons.Length != players.Count)
         {
