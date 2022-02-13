@@ -853,7 +853,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 622e5fb8688da9d4497b4bd8f184372d, type: 2}
   - {fileID: 2100000, guid: bcd927bb75a489e4c81b4a9e1fef2bb1, type: 2}
   - {fileID: 2100000, guid: 589746c719c3cce438d61375f0d8d29b, type: 2}
-  nextLevelDelay: 3
+  nextLevelDelayInSeconds: 5
 --- !u!1 &909106557
 GameObject:
   m_ObjectHideFlags: 0
