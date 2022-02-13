@@ -7,7 +7,7 @@ public class ColumnSpawner : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private GameObject ColumnPrefab;
     [SerializeField] private Material[] columnMaterials;
-    [SerializeField] private float nextLevelDelay;
+    [SerializeField] private float nextLevelDelayInSeconds;
     private List<Column> columns = new List<Column>();
     private Coroutine activeCoroutine;
     private Column currentChangedColumn;
@@ -25,6 +25,26 @@ public class ColumnSpawner : MonoBehaviour
     }
 
     public Material[] ColumnMaterials => columnMaterials;
+
+    public void StartGame()
+    {
+        SpawnColumns();
+        NextLevel();
+    }
+
+    public void NextLevel()
+    {
+        if (currentChangedColumn == null || currentChangedColumn.DefaultState)
+        {
+            currentChangedColumn = null;
+            activeCoroutine = StartCoroutine(ConfigureNextLevel());
+        }
+    }
+
+    public void StopGame()
+    {
+        DestroyAllColumns();
+    }
 
     private void SpawnColumns()
     {
@@ -62,29 +82,9 @@ public class ColumnSpawner : MonoBehaviour
         return RandomBag.RandomChoice(columns);
     }
 
-    public void StartGame()
-    {
-        SpawnColumns();
-        NextLevel();
-    }
-
-    public void StopGame()
-    {
-        DestroyAllColumns();
-    }
-
-    public void NextLevel()
-    {
-        if (currentChangedColumn == null || currentChangedColumn.DefaultState)
-        {
-            currentChangedColumn = null;
-            activeCoroutine = StartCoroutine(ConfigureNextLevel());
-        }
-    }
-
     IEnumerator ConfigureNextLevel()
     {
-        yield return new WaitForSeconds(nextLevelDelay);
+        yield return new WaitForSeconds(nextLevelDelayInSeconds);
         Material newMaterial = RandomBag.RandomChoice(columnMaterials);
         SetMaterialToRandomColumn(newMaterial);
     }

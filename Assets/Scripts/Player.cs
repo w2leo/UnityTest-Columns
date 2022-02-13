@@ -29,6 +29,11 @@ public class Player : MonoBehaviour
         AddVisualAbilities();
     }
 
+    public void AttacheButtonToPlayer(Button button)
+    {
+        button.onClick.AddListener(() => GoAndFixColumn());
+    }
+
     private void SetAbilityies(PlayerAbilities abilities)
     {
         this.abilities = abilities;
@@ -122,10 +127,5 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(activeCoroutine);
         }
-    }
-
-    public void AttacheButtonToPlayer(Button button)
-    {
-        button.onClick.AddListener(() => GoAndFixColumn());
     }
 }

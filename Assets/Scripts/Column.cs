@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 public class Column : MonoBehaviour
@@ -11,6 +9,8 @@ public class Column : MonoBehaviour
     private ColumnSpawner columnSpawner;
 
     public bool DefaultState => columsProperty.material == defaultMaterial;
+
+    public Material GetMaterial() => columsProperty.material;
 
     public void InitializeColumn(ColumnSpawner columnSpawner)
     {
@@ -26,12 +26,6 @@ public class Column : MonoBehaviour
             SetMaterial(material);
     }
 
-    private void SetMaterial(Material newMaterial)
-    {
-        columsProperty.material = newMaterial;
-        meshRenderer.material = columsProperty.material;
-    }
-
     public void FixMaterial()
     {
         if (!DefaultState)
@@ -41,5 +35,9 @@ public class Column : MonoBehaviour
         }
     }
 
-    public Material GetMaterial() => columsProperty.material;
+    private void SetMaterial(Material newMaterial)
+    {
+        columsProperty.material = newMaterial;
+        meshRenderer.material = columsProperty.material;
+    }
 }
