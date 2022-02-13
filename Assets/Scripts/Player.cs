@@ -7,18 +7,18 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
     [SerializeField] private Transform AbilityPrefab;
-    [SerializeField] private Transform abilityPosition;
-    private ColumnSpawner columnSpawner;
-    private List<Transform> abilityQuads = new List<Transform>();
-    private Vector3 startPoint;
+    [SerializeField] private Transform initialAbilityPosition;
     [SerializeField] private PlayerAbilities abilities;
+    private ColumnSpawner columnSpawner;
+    private List<Transform> abilityVisuals = new List<Transform>();
+    private Vector3 spawnPoint;
     Coroutine activeCoroutine;
-    private const float quadInterval = 0.6f;
+    private const float abilityXOffset = 0.6f;
     private bool isGoing;
 
     private void Start()
     {
-        startPoint = transform.position;
+        spawnPoint = transform.position;
         StopMove();
     }
 
@@ -36,29 +36,30 @@ public class Player : MonoBehaviour
 
     private void AddVisualAbilities()
     {
-        abilityQuads.Clear();
+        abilityVisuals.Clear();
         int abilitiesQuantity = abilities.fixMaterials.Count;
-        float xOffset = 0;
+        Vector3 position = Vector3.zero;
+        position.x = CountXOffset(abilitiesQuantity);
+        for (int i = 0; i < abilitiesQuantity; i++)
+        {
+            Transform newVisualAbility = Instantiate(AbilityPrefab, initialAbilityPosition);
+            newVisualAbility.localPosition = position;
+            abilityVisuals.Add(newVisualAbility);
+            newVisualAbility.GetComponent<MeshRenderer>().material = abilities.fixMaterials[i];
+            position.x += abilityXOffset;
+        }
+    }
 
+    private float CountXOffset(int abilitiesQuantity)
+    {
+        float xOffset = 0;
         if (abilitiesQuantity % 2 == 0)
             xOffset += 0.5f;
 
         xOffset += (int)abilitiesQuantity / 2;
         xOffset--;
-
-        Vector3 firstPosition = abilityPosition.localPosition;
-        firstPosition.x = -xOffset * quadInterval;
-        firstPosition.y = 0;
-        firstPosition.z = 0;
-
-        for (int i = 0; i < abilitiesQuantity; i++)
-        {
-            Transform newVisualAbility = Instantiate(AbilityPrefab, abilityPosition);
-            newVisualAbility.localPosition = firstPosition;
-            abilityQuads.Add(newVisualAbility);
-            newVisualAbility.GetComponent<MeshRenderer>().material = abilities.fixMaterials[i];
-            firstPosition.x += quadInterval;
-        }
+        Vector3 firstPosition = initialAbilityPosition.localPosition;
+        return -xOffset * abilityXOffset;
     }
 
     private void GoAndFixColumn()
@@ -67,7 +68,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        GoToPoint(columnSpawner.CurrentChangedColumn.transform.position);
+        MoveToPoint(columnSpawner.CurrentChangedColumn.transform.position);
     }
 
     private bool TryFixColumn(Column column)
@@ -76,12 +77,11 @@ public class Player : MonoBehaviour
         {
             return false;
         }
-
         column.FixMaterial();
         return true;
     }
 
-    private void GoToPoint(Vector3 destination)
+    private void MoveToPoint(Vector3 destination)
     {
         if (!isGoing)
         {
@@ -111,7 +111,7 @@ public class Player : MonoBehaviour
             StopMove();
             Column column = other.GetComponent<Column>();
             TryFixColumn(column);
-            GoToPoint(startPoint);
+            MoveToPoint(spawnPoint);
         }
     }
 

@@ -89,6 +89,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -113,6 +114,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!136 &8991980084827779072
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -158,8 +160,6 @@ MonoBehaviour:
   moveSpeed: 5
   AbilityPrefab: {fileID: 3612819163773180780, guid: 267f2174d997cd541bfff1640236c0c7,
     type: 3}
-  abilityPosition: {fileID: 4299300188468280384}
+  initialAbilityPosition: {fileID: 4299300188468280384}
   abilities:
-    fixMaterials:
-    - {fileID: 2100000, guid: 589746c719c3cce438d61375f0d8d29b, type: 2}
-    - {fileID: 2100000, guid: bcd927bb75a489e4c81b4a9e1fef2bb1, type: 2}
+    fixMaterials: []

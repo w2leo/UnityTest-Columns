@@ -27,7 +27,9 @@ public class PlayerSpawner : MonoBehaviour
     private void SpawnPlayers()
     {
         DestroyAllPlayers();
-        PlayerAbilities[] newAbilities = CreateAbilities();
+        int maxPlayers = spawnPoints.Length;
+        Material[] columnMaterials = columnSpawner.ColumnMaterials;
+        PlayerAbilities[] newAbilities = PlayerAbilities.CreateAbilities(columnMaterials, maxPlayers, MAX_ABILITIES);
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             CreatePlayerObject(newAbilities[i], spawnPoints[i].position);
@@ -50,54 +52,7 @@ public class PlayerSpawner : MonoBehaviour
             Destroy(player.gameObject);
         }
         players.Clear();
-    }
-
-    private PlayerAbilities[] CreateAbilities()
-    {
-        List<PlayerAbilities> newAbilities = new List<PlayerAbilities>();
-        AddMaterialsToAbilities(newAbilities);
-        return newAbilities.ToArray();
-    }
-
-    private void AddMaterialsToAbilities(List<PlayerAbilities> playersAbilities)
-    {
-        List<Material> materialBag = CreateMaterialBag();
-        for (int i = 0; i < spawnPoints.Length; i++)
-        {
-            int startIndex = i * MAX_ABILITIES;
-            int endIndex = startIndex + MAX_ABILITIES - 1;
-            playersAbilities.Add(new PlayerAbilities());
-            foreach (var item in RandomBag.SubArray(materialBag.ToArray(), startIndex, endIndex))
-            {
-                playersAbilities[i].fixMaterials.Add(item);
-            }
-        }
-    }
-
-    private List<Material> CreateMaterialBag()
-    {
-        List<Material> materialBag = new List<Material>();
-        AddBaseMaterials(materialBag);
-        AddAdditionalMaterials(materialBag);
-        RandomBag.SuffleBagNoSameNear(materialBag);
-        return materialBag;
-    }
-
-    private void AddBaseMaterials(List<Material> materialBag)
-    {
-        foreach (var material in columnSpawner.ColumnMaterials)
-        {
-            materialBag.Add(material);
-        }
-    }
-
-    private void AddAdditionalMaterials(List<Material> materialBag)
-    {
-        while (materialBag.Count < spawnPoints.Length * MAX_ABILITIES)
-        {
-            materialBag.Add(RandomBag.RandomChoice(columnSpawner.ColumnMaterials));
-        }
-    }
+    }  
 
     private void AttacheButtonsToPlayers()
     {
